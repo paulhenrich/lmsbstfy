@@ -7,7 +7,7 @@
             [ring.middleware.session :as session]
             [ring.middleware.session.cookie :as cookie]
             [org.httpkit.server :refer [run-server]]
-            [cemerick.drawbridge :as drawbridge]
+            [lmsbstfy.google-analytics :as ga]
             [environ.core :refer [env]]))
 
 (defroutes app
