@@ -5,6 +5,7 @@ pom.xml
 /.lein-repl-history
 /.lein-failures
 /.lein-env
+/.nrepl-port
 /checkouts
 /.env
 /target
