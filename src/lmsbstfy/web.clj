@@ -7,18 +7,29 @@
             [ring.middleware.session :as session]
             [ring.middleware.session.cookie :as cookie]
             [org.httpkit.server :refer [run-server]]
-            [lmsbstfy.google-analytics :as ga]
+            [org.httpkit.client :as http]
+            ;[lmsbstfy.google-analytics :as ga]
             [environ.core :refer [env]]))
+
+(defn fetch-remote-page [url]
+  @(http/get (str "http://" url) {:follow-redirects true}))
+
+(defn web-proxy [request]
+  (let [url (:* (:params request))
+        {:keys [status headers body error] :as response} (fetch-remote-page url)]
+    (if (or error
+            (not= "text/html" (:content-type headers)))
+      "Nerp"
+      body)))
+
 
 (defroutes app
   (GET "/" []
        {:status 200
         :headers {"Content-Type" "text/plain"}
         :body (pr-str ["Hello" :from 'Heroku])})
-  (GET "/disrupt/:url" [url]
-       :status 200
-       :headers {"Content-Type" "text/html"}
-       :body (slurp (str "http://" url))))
+  (GET "/disrupt/*" request
+       (web-proxy request)))
 
 (defn wrap-error-page [handler]
   (fn [req]
