@@ -1,6 +1,6 @@
 @font-face {
   font-family: SansBullshitSans;
-  src: url('http://localhost:5000/SansBullshitSans.ttf');
+  src: url('http://lmsbstfy.herokuapp.com/SansBullshitSans.ttf');
 }
 
 body, h1, h2, h3, p {
