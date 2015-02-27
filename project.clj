@@ -7,6 +7,7 @@
                  [compojure "1.3.2"]
                  [javax.servlet/servlet-api "2.5"]
                  [http-kit "2.1.16"]
+                 [hickory "0.5.4"]
                  [ring/ring-devel "1.3.2"]
                  [ring/ring-core "1.3.2"]
                  [environ "0.5.0"]

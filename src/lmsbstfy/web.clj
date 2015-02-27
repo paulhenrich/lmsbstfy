@@ -8,19 +8,30 @@
             [ring.middleware.session.cookie :as cookie]
             [org.httpkit.server :refer [run-server]]
             [org.httpkit.client :as http]
+            [hickory.core :as hk]
             ;[lmsbstfy.google-analytics :as ga]
             [environ.core :refer [env]]))
 
 (defn fetch-remote-page [url]
-  @(http/get (str "http://" url) {:follow-redirects true}))
+  @(http/get url {:follow-redirects true
+                  :max-redirects 3}))
+
+(defn sans-bullshit-sans-ify [url body]
+  (str
+       "<!--lolhtml-->"
+       "<style type=\"text/css\">
+ body, h1, h2, h3, p { font-family: \"Comic Sans MS\"!important;} </style>"
+       "<base href=\"http://" url "\"/>"
+       body
+       ))
 
 (defn web-proxy [request]
-  (let [url (:* (:params request))
+  (let [url (str "http://" (:* (:params request)))
         {:keys [status headers body error] :as response} (fetch-remote-page url)]
     (if (or error
-            (not= "text/html" (:content-type headers)))
-      "Nerp"
-      body)))
+            (not (boolean (re-find #"text/html" (:content-type headers)))))
+      "^ put the url of the page you want to see after /disrupt/ e.g. /disrupt/example.com ^"
+      (sans-bullshit-sans-ify url body))))
 
 
 (defroutes app
