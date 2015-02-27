@@ -10,23 +10,37 @@
             [org.httpkit.client :as http]
             [hickory.core :as hk]
             ;[lmsbstfy.google-analytics :as ga]
-            [environ.core :refer [env]]))
+            [environ.core :refer [env]])
+  (:use [ring.middleware ratelimit]))
+
+(use 'hiccup.core 'hiccup.page)
+;; todo:
+;;   - semantic injection if necessary
+;;   - GA
 
 (defn fetch-remote-page [url]
   @(http/get url {:follow-redirects true
                   :max-redirects 3}))
 
+(def style-tag (html [:style {:type "text/css"} (slurp "resources/lmsbstfy.css")]))
+(def banner-tag (html [:div {:class "lmsbstfy-banner"} (slurp "resources/banner.html")]))
+(defn base-tag [url] (html [:base {:href url}]))
+
 (defn sans-bullshit-sans-ify [url body]
   (str
-       "<!--lolhtml-->"
-       "<style type=\"text/css\">
- body, h1, h2, h3, p { font-family: \"Comic Sans MS\"!important;} </style>"
-       "<base href=\"http://" url "\"/>"
-       body
-       ))
+   style-tag
+   banner-tag
+   (base-tag url)
+   body))
+
+(defn urlify [url-ish]
+  "Take a guess at the intended URL"
+  (if (re-find #"^http" url-ish)
+    url-ish
+    (str "http://" url-ish)))
 
 (defn web-proxy [request]
-  (let [url (str "http://" (:* (:params request)))
+  (let [url (urlify (:* (:params request)))
         {:keys [status headers body error] :as response} (fetch-remote-page url)]
     (if (or error
             (not (boolean (re-find #"text/html" (:content-type headers)))))
@@ -35,12 +49,10 @@
 
 
 (defroutes app
-  (GET "/" []
-       {:status 200
-        :headers {"Content-Type" "text/plain"}
-        :body (pr-str ["Hello" :from 'Heroku])})
+  (GET "/" [] (io/resource "public/index.html"))
   (GET "/disrupt/*" request
-       (web-proxy request)))
+       (web-proxy request))
+  (route/resources "/"))
 
 (defn wrap-error-page [handler]
   (fn [req]
@@ -54,6 +66,7 @@
   ;; TODO: heroku config:add SESSION_SECRET=$RANDOM_16_CHARS
   (let [store (cookie/cookie-store {:key (env :session-secret)})]
     (-> app
+        (wrap-ratelimit {:limits [(ip-limit 100)]})
         ((if (env :production)
            wrap-error-page
            trace/wrap-stacktrace))
