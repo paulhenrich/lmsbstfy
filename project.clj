@@ -1,8 +1,8 @@
 (defproject lmsbstfy "1.0.0-SNAPSHOT"
-  :description "FIXME: write description"
+  :description "a web proxy that crudely injects the sans-bullshit-sans font"
   :url "http://lmsbstfy.herokuapp.com"
-  :license {:name "FIXME: choose"
-            :url "http://example.com/FIXME"}
+  :license {:name "MIT"
+            :url "http://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [compojure "1.3.2"]
                  [javax.servlet/servlet-api "2.5"]
