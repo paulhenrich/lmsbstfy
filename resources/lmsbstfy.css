@@ -3,17 +3,18 @@
   src: url('http://lmsbstfy.herokuapp.com/SansBullshitSans.ttf');
 }
 
-body, h1, h2, h3, p {
+body, h1, h2, h3, p, a, span, div {
+  text-transform: lowercase!important;
   font-family: SansBullshitSans!important;
-  text-transform: lowercase;
+  font: SansBullshitSans!important;
 }
 
 .lmsbstfy-banner {
-  position: absolute;
+  position: relative;
   z-index: 10000;
   width: 100%;
   padding: 2px 10px;
   background-color: white;
   border-bottom: 1px dashed black;
-  font-family: "Comic Sans MS", "Comic Sans", sans-serif;
+  font-family: SansBullshitSans;
 }

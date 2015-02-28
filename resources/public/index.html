@@ -1,6 +1,14 @@
 <html>
   <head>
     <title>Let me Sans Bullshit Sans that for you</title>
+    <style type="text/css">
+      body {
+        margin: 20px;
+        font-family: sans-serif;
+        line-height: 1.4em;
+        max-width: 750px;
+      }
+    </style>
     <script>
       function disrupt(){
         window.location = "/disrupt/" + document.getElementById("url").value;
@@ -9,9 +17,11 @@
   </head>
   <body>
     <h1> Let me Sans Bullshit Sans that for you </h1>
+    <form onsubmit="disrupt(); return false;">
       <span>http://lmsbstfy.herokuapp.com/disrupt/</span>
       <input type="text" name="url" id="url" placeholder="example.com" width="80">
-      <input type="button" value="DISRUPT" onclick="disrupt()">
+      <input type="submit" value="DISRUPT">
+    </form>
       <p>
         An unofficial project to apply the incredible <a href="http://sansbullshitsans.com">Sans Bullshit Sans</a>
         font to buzzwordy web pages. The browser limitations described there apply here. Known to work in Firefox.
