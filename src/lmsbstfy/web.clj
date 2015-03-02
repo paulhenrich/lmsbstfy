@@ -43,7 +43,7 @@
   (let [url (urlify (:* (:params request)))
         {:keys [status headers body error] :as response} (fetch-remote-page url)]
     (if (or error
-            (not (boolean (re-find #"text/html" (:content-type headers)))))
+            (not (re-find #"html" (:content-type headers))))
       "^ put the url of the page you want to see after /disrupt/ e.g. /disrupt/example.com ^"
       (sans-bullshit-sans-ify url body))))
 
