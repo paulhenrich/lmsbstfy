@@ -13,3 +13,7 @@
   (let [index (app (mock/request :get "/"))]
     (is 200 (:status index))
     (is (.contains (body-of index) "bullshit"))))
+
+(deftest test-urlify
+  (is "http://example.com" (urlify "http://example.com"))
+  (is "http://example.com" (urlify "example.com")))
