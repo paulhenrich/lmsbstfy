@@ -5,33 +5,19 @@
             [clojure.java.io :as io]
             [ring.middleware.stacktrace :as trace]
             [ring.middleware.session :as session]
-            [ring.middleware.session.cookie :as cookie]
             [org.httpkit.server :refer [run-server]]
             [org.httpkit.client :as http]
-            [hickory.core :as hk]
-            ;[lmsbstfy.google-analytics :as ga]
+            [lmsbstfy.sans-ify :refer [sans-bullshit-sans-ify]]
             [environ.core :refer [env]])
   (:use [ring.middleware ratelimit]))
 
-(use 'hiccup.core 'hiccup.page)
 ;; todo:
-;;   - semantic injection if necessary
 ;;   - GA
+
 
 (defn fetch-remote-page [url]
   @(http/get url {:follow-redirects true
                   :max-redirects 3}))
-
-(def style-tag (html [:style {:type "text/css"} (slurp "resources/lmsbstfy.css")]))
-(def banner-tag (html [:div {:class "lmsbstfy-banner"} (slurp "resources/banner.html")]))
-(defn base-tag [url] (html [:base {:href url}]))
-
-(defn sans-bullshit-sans-ify [url body]
-  (str
-   style-tag
-   banner-tag
-   (base-tag url)
-   body))
 
 (defn urlify [url-ish]
   "Take a guess at the intended URL"
@@ -46,7 +32,6 @@
             (not (re-find #"html" (:content-type headers))))
       "^ put the url of the page you want to see after /disrupt/ e.g. /disrupt/example.com ^"
       (sans-bullshit-sans-ify url body))))
-
 
 (defroutes app
   (GET "/" [] (io/resource "public/index.html"))
@@ -63,14 +48,11 @@
             :body (slurp (io/resource "500.html"))}))))
 
 (defn wrap-app [app]
-  ;; TODO: heroku config:add SESSION_SECRET=$RANDOM_16_CHARS
-  (let [store (cookie/cookie-store {:key (env :session-secret)})]
-    (-> app
-        (wrap-ratelimit {:limits [(ip-limit 100)]})
-        ((if (env :production)
-           wrap-error-page
-           trace/wrap-stacktrace))
-        (site {:session {:store store}}))))
+  (-> app
+      (wrap-ratelimit {:limits [(ip-limit 100)]})
+      ((if (env :production)
+         wrap-error-page
+         trace/wrap-stacktrace))))
 
 (defn -main [& [port]]
   (let [port (Integer. (or port (env :port) 5000))]
