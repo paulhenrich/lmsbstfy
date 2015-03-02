@@ -1,6 +1,15 @@
 (ns lmsbstfy.web-test
   (:require [clojure.test :refer :all]
+            [ring.mock.request :as mock]
             [lmsbstfy.web :refer :all]))
 
-(deftest first-test
-  (is false "Tests should be written"))
+(defn body-of [response]
+  (let [body (:body response)]
+    (if (= java.io.File (type body))
+      (slurp body)
+      body)))
+
+(deftest index-route
+  (let [index (app (mock/request :get "/"))]
+    (is 200 (:status index))
+    (is (.contains (body-of index) "bullshit"))))
