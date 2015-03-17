@@ -3,7 +3,7 @@
   src: url('http://lmsbstfy.herokuapp.com/SansBullshitSans.ttf');
 }
 
-body, h1, h2, h3, p, a, span, div {
+*, body, h1, h2, h3, p, a, span, div, pre {
   text-transform: lowercase!important;
   font-family: SansBullshitSans!important;
   font: SansBullshitSans!important;
